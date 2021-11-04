@@ -1,0 +1,4 @@
+Host gitlab.com
+  IdentityFile ~/.ssh/gitlab-deploy-key
+  StrictHostKeyChecking no
+
