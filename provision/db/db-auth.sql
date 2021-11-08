@@ -1,2 +1,0 @@
-GRANT ALL ON *.* TO 'admin'@'localhost' IDENTIFIED BY 'dbpassword123' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
