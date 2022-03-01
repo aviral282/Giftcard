@@ -1,4 +1,4 @@
-import { UserDTO } from '@user/dto/user.dto';
+import { CategoriesDTO } from '@user/dto/categories.dto';
 
 export interface LoginStatus {
   uId: number;

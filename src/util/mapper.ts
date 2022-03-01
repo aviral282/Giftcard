@@ -1,14 +1,14 @@
 
-import { UserEntity } from '@user/entities/user.entity';
-import { UserDTO } from '@user/dto/user.dto';
+import { CategoriesEntity } from '@user/entities/categories.entity';
+import { CategoriesDTO } from '@user/dto/categories.dto';
 import { CardProgramEntity } from 'src/cardPrograms/entities/cardprogram.entity';
 import { CardProgramDTO } from 'src/cardPrograms/dto/cardprogram.dto';
 
 
 
-export const toUserDto = (data: UserEntity): UserDTO => {
+export const toCategoriesDto = (data: CategoriesEntity): CategoriesDTO => {
   const { CategoryId, CategoryName } = data;
-  let userDto: UserDTO = {
+  let userDto: CategoriesDTO = {
     CategoryId, CategoryName
   };
 

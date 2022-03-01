@@ -5,7 +5,7 @@ import {
 } from "typeorm";
 
 @Entity("categories_lookup", { schema: "giftcardapi" })
-export class UserEntity {
+export class CategoriesEntity {
   @PrimaryGeneratedColumn({ type: "int", name: "CategoryId" })
   CategoryId: number;
 

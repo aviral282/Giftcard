@@ -1,7 +1,7 @@
 //import { ScoreDTO } from './score.dto';
 import { IsEmail, IsInt, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-export class UserDTO {
+export class CategoriesDTO {
   CategoryId: number;
 
   @IsString()
