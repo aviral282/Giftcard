@@ -4,12 +4,12 @@ import {
   PrimaryGeneratedColumn
 } from "typeorm";
 
-@Entity("testtable", { schema: "giftcardapi" })
+@Entity("categories_lookup", { schema: "giftcardapi" })
 export class UserEntity {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
-  id: number;
-  
-  @Column("varchar", { name: "value", length: 128 })
-  value: string;
+  @PrimaryGeneratedColumn({ type: "int", name: "CategoryId" })
+  CategoryId: number;
+
+  @Column("varchar", { name: "CategoryName", length: 500 })
+  CategoryName: string;
 
 }

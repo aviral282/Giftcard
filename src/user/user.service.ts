@@ -17,15 +17,11 @@ export class UserService {
   }
 
 
-  async getAllUsers(): Promise<UserDTO[]> {
+  async getAllUsers(): Promise<any[]> {
     const users = await this.userRepository.find();
+    console.log('getAllUsers', users);
     return users.map(user => toUserDto(user));
   }
-
-
-
-
-
 
 
 
@@ -34,8 +30,8 @@ export class UserService {
     return toUserDto(user);
   }
 
-  async read(id: number) {
-    const user = await this.userRepository.findOne({ where: { id: id } })
+  async read(CategoryId: number) {
+    const user = await this.userRepository.findOne({ where: { CategoryId: CategoryId } })
     return toUserDto(user);
   }
 

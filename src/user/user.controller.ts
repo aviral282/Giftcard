@@ -6,7 +6,6 @@ import {
   HttpStatus
 } from '@nestjs/common';
 import { UserService } from '@user/user.service';
-import { UserListDTO } from '@user/dto/user.list.dto';
 
 @Controller('api/user')
 export class UserController {
@@ -15,17 +14,17 @@ export class UserController {
 
 
   @Get()
-  async showAllUsers(@Req() req: any): Promise<UserListDTO> {
+  async showAllUsers(@Req() req: any): Promise<any> {
     const users = await this.userService.getAllUsers();
     return { users };
   }
 
 
   @Get(':id')
-  async readUser(@Param('id') id: number) {
+  async readUser(@Param('id') CategoryId: number) {
     return {
       statusCode: HttpStatus.OK,
-      data: await this.userService.read(id),
+      data: await this.userService.read(CategoryId),
     };
   }
 

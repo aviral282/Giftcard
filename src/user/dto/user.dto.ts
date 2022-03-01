@@ -2,12 +2,11 @@
 import { IsEmail, IsInt, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class UserDTO {
-// export interface UserDTO {
-  id: number;
+  CategoryId: number;
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(128)
-  value: string;
+  @MaxLength(500)
+  CategoryName: string;
 
 }
