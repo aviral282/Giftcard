@@ -3,7 +3,6 @@ import { Any, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CardProgramEntity } from './entities/cardprogram.entity';
 import { toCardProgramDto } from '@util/mapper';
-import { Query } from '@nestjs-query/core';
 
 @Injectable()
 export class CardProgramService {
