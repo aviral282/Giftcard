@@ -24,5 +24,8 @@ export class CardProgramEntity {
   @Column("int", { name: "carddiscount" })
   CardDiscount: number;
 
+  @Column("int", { name: "categoryId" })
+  ProgramCategoryId: number;
+
 
 }

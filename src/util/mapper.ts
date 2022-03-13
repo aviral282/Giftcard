@@ -8,18 +8,18 @@ import { CardProgramDTO } from 'src/cardPrograms/dto/cardprogram.dto';
 
 export const toCategoriesDto = (data: CategoriesEntity): CategoriesDTO => {
   const { CategoryId, CategoryName } = data;
-  let userDto: CategoriesDTO = {
+  let categoriesrDto: CategoriesDTO = {
     CategoryId, CategoryName
   };
 
-  return userDto;
+  return categoriesrDto;
 };
 
 
 export const toCardProgramDto = (data: CardProgramEntity): CardProgramDTO => {
-  const { CardProgramId, CardProgramName, CardProgramDisplayName, CardProgramMerchantId, CardDiscount, CardPrice } = data;
+  const { CardProgramId, ProgramCategoryId, CardProgramName, CardProgramDisplayName, CardProgramMerchantId, CardDiscount, CardPrice } = data;
   let cardProgramDto: CardProgramDTO = {
-    CardProgramId, CardProgramName, CardProgramDisplayName, CardProgramMerchantId, CardDiscount, CardPrice
+    CardProgramId, ProgramCategoryId, CardProgramName, CardProgramDisplayName, CardProgramMerchantId, CardDiscount, CardPrice
   };
 
   return cardProgramDto;

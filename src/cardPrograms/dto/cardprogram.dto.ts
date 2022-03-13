@@ -20,5 +20,7 @@ export class CardProgramDTO {
   @MaxLength(500)
   CardProgramDisplayName: string;
 
+  ProgramCategoryId: number;
+
 
 }

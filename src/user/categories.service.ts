@@ -31,7 +31,7 @@ export class CategoriesService {
   // }
 
   async read(CategoryId: number) {
-    const categories = await this.categoriesRepository.findOne({ where: { CategoryId: CategoryId } })
+    const categories = await this.categoriesRepository.findOne({ where: { CategoryName: CategoryId } })
     return toCategoriesDto(categories);
   }
 

@@ -16,7 +16,7 @@ export class CardProgramController {
 
   @Get()
   async showAllDiscountedCards(@Req() req: any): Promise<any> {
-    const cardPrograms = await this.cardProgramService.getAllCardPrograms();
+    const cardPrograms = await this.cardProgramService.getAllDiscountedCardPrograms();
     return { cardPrograms };
   }
 
@@ -29,7 +29,13 @@ export class CardProgramController {
     };
   }
 
-
+  @Get('category/:name')
+  async cardByCategory(@Param('name') CardCategory: any) {
+    return {
+      statusCode: HttpStatus.OK,
+      data: await this.cardProgramService.getCardProgramsByCategory(CardCategory),
+    };
+  }
 
 
 

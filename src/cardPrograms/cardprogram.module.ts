@@ -4,10 +4,13 @@ import { CardProgramController } from './cardprogram.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 //import { CardProgramEntity } from '@cardPrograms/entities/cardprogram.entity';
 import { CardProgramEntity } from './entities/cardprogram.entity';
+import { CategoriesEntity } from '@user/entities/categories.entity';
+
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CardProgramEntity])
+    TypeOrmModule.forFeature([CardProgramEntity]),
+    TypeOrmModule.forFeature([CategoriesEntity])
   ],
   exports: [TypeOrmModule, CardProgramService],
   providers: [CardProgramService],

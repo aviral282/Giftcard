@@ -3,35 +3,53 @@ import { Any, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CardProgramEntity } from './entities/cardprogram.entity';
 import { toCardProgramDto } from '@util/mapper';
+import { CategoriesEntity } from '@user/entities/categories.entity';
 
 @Injectable()
 export class CardProgramService {
   constructor(
     @InjectRepository(CardProgramEntity)
-    private cardProgram: Repository<CardProgramEntity>
+    private cardProgram: Repository<CardProgramEntity>,
+    @InjectRepository(CategoriesEntity)
+    private categories: Repository<CategoriesEntity>
   ) { }
 
   findAll(): Promise<CardProgramEntity[]> {
     return this.cardProgram.find();
   }
 
-
-  async getAllCardPrograms(): Promise<any[]> {
-
-
-
-    let filter = {};
-
-
-    filter = {
-      CardDiscount: [{ CardDiscount: { gt: 0 } }]
-    }
-
-
-
-    console.log('filter', filter);
-    const cardPrograms = await this.cardProgram.find();
+  async getCardProgramsByCategory(CardCategory: any): Promise<any[]> {
     
+    const cardPrograms = await this.cardProgram.find();
+    const categories = await this.categories.find();
+
+    let currentCategoryId = 0;
+
+    categories.forEach(i => {
+      if(i.CategoryName == CardCategory)
+      {
+        currentCategoryId = i.CategoryId;
+      }
+    })
+
+    console.log('Category ID', currentCategoryId);
+    let newCardProg = [];
+   
+    cardPrograms.forEach(i => {
+      if(i.ProgramCategoryId == currentCategoryId )
+      {
+        newCardProg.push(i);
+      }
+    });
+    
+    console.log('getAllCardPrograms', newCardProg);
+    return newCardProg.map(user => toCardProgramDto(user));
+  }
+
+
+  async getAllDiscountedCardPrograms(): Promise<any[]> {
+    
+    const cardPrograms = await this.cardProgram.find();
     let newCardProg = [];
    
     cardPrograms.forEach(i => {
@@ -40,8 +58,6 @@ export class CardProgramService {
         newCardProg.push(i);
       }
     });
-      
-
 
     console.log('getAllCardPrograms', newCardProg);
     return newCardProg.map(user => toCardProgramDto(user));

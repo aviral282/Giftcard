@@ -17,5 +17,7 @@ export class CreateCardProgramDTO {
 
   CardDiscount: number;
 
+  ProgramCategoryId: number;
+
 
 }

@@ -13,7 +13,7 @@ import { AuthModule } from './auth/auth.module';
       type: 'mariadb',
       host: 'localhost',
       port: 3306,
-      username: 'admin',
+      username: 'root',
       password: 'dbpassword123',
       database: 'giftcardapi',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],

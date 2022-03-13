@@ -27,10 +27,4 @@ export class CategoriesController {
       data: await this.categoriesService.read(CategoryId),
     };
   }
-
-
-
-
-
-
 }
