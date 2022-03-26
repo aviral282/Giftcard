@@ -5,10 +5,12 @@ import { CategoriesModule } from './user/categories.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
+import { CardsModule } from './cards/cards.module';
 
 @Module({
   imports: [
     CategoriesModule,
+    CardsModule,
     TypeOrmModule.forRoot({
       type: 'mariadb',
       host: 'localhost',
