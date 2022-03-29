@@ -67,7 +67,6 @@ export class CardsService {
     return num;
   }
 
-
   async sendMail(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance) {
     mailer.createTestAccount((err, account) => {
       if (err) {
