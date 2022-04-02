@@ -6,6 +6,8 @@ import { toCardsDto } from '@util/mapper';
 import { CreateCardsDTO } from './dto/cards.create.dto';
 import { CardProgramEntity } from 'src/cardPrograms/entities/cardprogram.entity';
 import * as mailer from 'nodemailer'
+import * as wordToNum from 'words-to-numbers'
+import * as emailValidator from 'email-validator'
 
 @Injectable()
 export class CardsService {
@@ -25,32 +27,129 @@ export class CardsService {
     return toCardsDto(card);
   }
 
-  // Tesco:string , amt:string  
-  // if(amt!){ return "trans failed"}
-  // else 
-  // 
+  async HighestSellingMerchant()
+  {
+    const cardPrograms = await this.cardProgram.find();
+    const cards = await this.cards.find();
+    
+    let cardToCardProgram = new Map();
+
+    cards.forEach(i => {
+      if(!cardToCardProgram.has(i.CardProgramId))
+      {
+        cardToCardProgram.set(i.CardProgramId,1);
+      }
+      else
+      {
+        let currentVal = cardToCardProgram.get(i.CardProgramId);
+        currentVal++;
+        cardToCardProgram.delete(i.CardProgramId);
+        cardToCardProgram.set(i.CardProgramId,currentVal);
+      }
+    }) 
+
+    let maxValue = 0;
+    let CardProgramId = 0;
+
+    cardToCardProgram.forEach(function(value, key) {
+      if(value > maxValue)
+      {
+        maxValue = value;
+        CardProgramId = key;
+      }
+    })
+    
+    let highestSellingProgramName = '';
+    cardPrograms.forEach(i => {
+      if (i.CardProgramId == CardProgramId) {
+        highestSellingProgramName = i.CardProgramName;
+      } 
+    });
+
+    let splitString = highestSellingProgramName.split("_");
+    highestSellingProgramName = splitString[0].toString();
+    return highestSellingProgramName;
+
+  }
 
   async createGiftCard(createGiftCardDto: any): Promise<any> {
+   
+   try{
     console.log('createGiftCardDto', createGiftCardDto);
-    const { CardCreationBalance, CardCustomerName, CardRecepientAddress, MerchantName } = createGiftCardDto;
+    let { CardCreationBalance, CardCustomerName, CardRecepientAddress, MerchantName, GreetingMessage } = createGiftCardDto;
 
     let MatchString = MerchantName + "_" + CardCreationBalance;
-    let CardProgramId;  // dusre table se
+    let CardProgramId = 0;  // dusre table se
     const cardPrograms = await this.cardProgram.find();
     cardPrograms.forEach(i => {
-      if (i.CardProgramName.toLowerCase() != MatchString.toLowerCase()) {
-        return "Transaction failed!";
-      } else { CardProgramId = i.CardProgramId; }
+      if (i.CardProgramName.toLowerCase() === MatchString.toLowerCase()) {
+        CardProgramId = i.CardProgramId;
+      }
     });
+
+   let finalEmail = await this.formatEmail(CardRecepientAddress);
+    console.log(finalEmail);
+    CardRecepientAddress = finalEmail;
+
+    if(CardProgramId === 0 && emailValidator.validate(CardRecepientAddress))
+    {
+      console.log("here**************");
+      throw new Error("Invalid Program");
+    }
     let CardNumber = this.getCardNumber();
     let CardPin = this.getCardPin();
     let CardCurrentBalance = CardCreationBalance;
     const user: CardsEntity = this.cards.create({
       CardNumber, CardCreationBalance, CardCustomerName, CardCurrentBalance, CardPin, CardRecepientAddress, CardProgramId
     });
-    await this.cards.save(user);
-    this.sendMail(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance)
-    return toCardsDto(user);
+    
+    //let res = await this.sendMail(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance, GreetingMessage,CardCustomerName);
+    let res = await this.emailSend(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance, GreetingMessage,CardCustomerName);
+    
+    console.log('************************** RES: '+res);
+     if(res != 0)
+     {
+     await this.cards.save(user);
+     return toCardsDto(user);
+     }
+    else
+     {
+       throw new Error("Invalid Email");
+     }
+    
+    
+   }
+   catch(error)
+   {
+     console.log('Error in Create Gift Card: '+error);
+     throw error;
+   }
+   
+  }
+
+  formatEmail(passedEmail)
+  {
+    let splitString = passedEmail.split(" ");
+    console.log(splitString);
+
+    for (let i = 0; i < splitString.length; i++) {
+      if(splitString[i] === 'dot')
+      {
+        splitString[i] = '.';
+      }
+    }
+
+    if(splitString[splitString.length - 4] === 'at')
+    {
+      splitString[splitString.length - 4] = '@';
+    }    
+    let str = '';
+    splitString.forEach(i =>
+      {
+        str += wordToNum.wordsToNumbers(i);
+      });
+
+      return str;
   }
 
   getCardNumber() {
@@ -67,39 +166,83 @@ export class CardsService {
     return num;
   }
 
-  async sendMail(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance) {
-    mailer.createTestAccount((err, account) => {
-      if (err) {
-        console.error('Failed to create a testing account');
-        console.error(err);
-        return process.exit(1);
+  async emailSend(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance, GreetingMessage,CardCustomerName) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    let testAccount = await mailer.createTestAccount();
+  
+    // create reusable transporter object using the default SMTP transport
+    let transporter = mailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      auth: {
+        user: 'giftcardsendmail@gmail.com',
+        pass: 'Qwerty@22'
       }
-      let transporter = mailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        auth: {
-          user: 'giftcardsendmail@gmail.com',
-          pass: 'Qwerty@22'
-        }
-      });
-      let emailText = 'Card Number : ' + CardNumber + '\n' + 'Card Pin : ' + CardPin + '\n' + 'Merchant Name: ' + MerchantName + '\n' +
+    });
+  
+    let emailText = 'Dear ' + CardCustomerName + ',' + '\n' +  GreetingMessage + '\n' +  'Here are your gift card details : ' + '\n' + 'Card Number : ' + CardNumber + '\n' + 'Card Pin : ' + CardPin + '\n' + 'Merchant Name: ' + MerchantName + '\n' +
         'Your Card Balance : ' + CardCreationBalance;
       let message = {
         to: CardRecepientAddress,
         subject: 'Hurray! You got a new Gift Card! ',
         text: emailText,
       };
-      transporter.sendMail(message, (error, info) => {
-        if (error) {
-          console.log('Error occurred');
-          console.log(error.message);
-          return process.exit(1);
-        }
-        transporter.close();
-      });
-    });
-    console.log('Message sent successfully!');
+  
+    // send mail with defined transport object
+    let info = await transporter.sendMail(message).then( console.log('Sending Mail')).catch(() => {return 0;});
+    return info;
   }
+
+//   async sendMail(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance, GreetingMessage,CardCustomerName) {
+// // try{
+
+//   const a =  mailer.createTestAccount(async(err, account) => {
+//     if (err) {
+//       console.error('Failed to create a testing account');
+//       console.error(err);
+//     }
+//     let transporter =  await mailer.createTransport({
+//       host: 'smtp.gmail.com',
+//       port: 587,
+//       auth: {
+//         user: 'giftcardsendmail@gmail.com',
+//         pass: 'Qwerty@22'
+//       }
+//     });
+    
+//     let emailText = 'Dear ' + CardCustomerName + ',' + '\n' +  GreetingMessage + '\n' +  'Here are your gift card details : ' + '\n' + 'Card Number : ' + CardNumber + '\n' + 'Card Pin : ' + CardPin + '\n' + 'Merchant Name: ' + MerchantName + '\n' +
+//       'Your Card Balance : ' + CardCreationBalance;
+//     let message = {
+//       to: CardRecepientAddress,
+//       subject: 'Hurray! You got a new Gift Card! ',
+//       text: emailText,
+//     };
+
+//      await transporter.sendMail(message, (error, info) => {
+//       if (error) {
+//         console.log('Error occurred');
+//         console.log(error.message);
+//         return error;
+//       }
+//       transporter.close();
+//     });
+//     return transporter;
+//   });
+//   console.log(a);
+//   console.log('Message sent successfully!');
+//   return a;
+
+// //}
+// // catch(error)
+// // {
+// // console.log('Error occurred while sending mail: '+error);
+// // throw error;
+// }
+
 
 
 }
+
+
+

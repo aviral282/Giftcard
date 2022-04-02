@@ -39,6 +39,7 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "dotenv": "^8.6.0",
+    "email-validator": "^2.0.4",
     "mysql2": "^2.2.5",
     "nestjs-rbac": "^1.6.0",
     "nodemailer": "^6.7.3",
@@ -47,7 +48,8 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
-    "typeorm": "^0.2.35"
+    "typeorm": "^0.2.35",
+    "words-to-numbers": "^1.5.1"
   },
   "devDependencies": {
     "@automapper/types": "^3.0.7",

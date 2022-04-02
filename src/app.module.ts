@@ -16,7 +16,7 @@ import { CardsModule } from './cards/cards.module';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'root',
+      password: 'dbpassword123',
       database: 'giftcardapi',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,

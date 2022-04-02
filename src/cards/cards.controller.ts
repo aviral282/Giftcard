@@ -22,27 +22,34 @@ export class CardsController {
     return { cardPrograms };
   }
 
-
-  // Tesco:string , amt:string  
-  // if(amt!){ return "trans failed"}
-  // else 
-  // 
-
   @Post('createGiftCard')
   async createUsersdsds(@Body() data: any) {
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'User added successfully',
-      data: await this.cardsService.createGiftCard(data),
-    };
+    try{
+      let d = await this.cardsService.createGiftCard(data);
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Gift Card Transaction Successful and Card details sent over email.',
+        data: d,
+      };
+    }
+    catch(error)
+    {
+      return{
+        statusCode: HttpStatus.BAD_REQUEST,
+        message: 'Transaction Failed, please try again.'
+      }
+    }
+    
   }
 
-  @Get(':newcard')
-  async createUser(@Body() CardNumber: any) {
+  @Get("highestSellingMerchant")
+  async findTrendingMerchant()
+  {
+    let d = await this.cardsService.HighestSellingMerchant();
     return {
       statusCode: HttpStatus.OK,
-      data: await this.cardsService.read(CardNumber),
-    };
+      data: d
+    }
   }
 
   @Get(':id')
