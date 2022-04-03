@@ -76,7 +76,7 @@ export class CardsService {
    
    try{
     console.log('createGiftCardDto', createGiftCardDto);
-    let { CardCreationBalance, CardCustomerName, CardRecepientAddress, MerchantName, GreetingMessage } = createGiftCardDto;
+    let { CardCreationBalance, CardCustomerName, CardRecepientAddress, MerchantName, GreetingMessage, PurchaserEmailAddress, PurchaserName } = createGiftCardDto;
 
     let MatchString = MerchantName + "_" + CardCreationBalance;
     let CardProgramId = 0;  // dusre table se
@@ -105,9 +105,10 @@ export class CardsService {
     
     //let res = await this.sendMail(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance, GreetingMessage,CardCustomerName);
     let res = await this.emailSend(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance, GreetingMessage,CardCustomerName);
+    let sendRes = await this.sendBillingEmail(PurchaserEmailAddress, MerchantName, CardCreationBalance,CardCustomerName,PurchaserName);
     
     console.log('************************** RES: '+res);
-     if(res != 0)
+     if(res != 0 && sendRes != 0)
      {
      await this.cards.save(user);
      return toCardsDto(user);
@@ -182,7 +183,7 @@ export class CardsService {
     });
   
     let emailText = 'Dear ' + CardCustomerName + ',' + '\n' +  GreetingMessage + '\n' +  'Here are your gift card details : ' + '\n' + 'Card Number : ' + CardNumber + '\n' + 'Card Pin : ' + CardPin + '\n' + 'Merchant Name: ' + MerchantName + '\n' +
-        'Your Card Balance : ' + CardCreationBalance;
+        'Your Card Balance in Euros : ' + CardCreationBalance;
       let message = {
         to: CardRecepientAddress,
         subject: 'Hurray! You got a new Gift Card! ',
@@ -194,51 +195,35 @@ export class CardsService {
     return info;
   }
 
-//   async sendMail(CardNumber, CardPin, CardRecepientAddress, MerchantName, CardCreationBalance, GreetingMessage,CardCustomerName) {
-// // try{
+  async sendBillingEmail(PurchaserEmailAddress, MerchantName, CardCreationBalance,CardCustomerName,PurchaserName) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    let testAccount = await mailer.createTestAccount();
+  
+    // create reusable transporter object using the default SMTP transport
+    let transporter = mailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      auth: {
+        user: 'giftcardsendmail@gmail.com',
+        pass: 'Qwerty@22'
+      }
+    });
+  
+    let emailText = 'Dear ' + PurchaserName + ',' + '\n' +  'Your gift card purchase has been completed successfully and card details are sent to ' + CardCustomerName +' : ' + '\n' + 'Merchant Name: ' + MerchantName + '\n' +
+        'Your Card Amount in Euros : ' + CardCreationBalance;
+      let message = {
+        to: PurchaserEmailAddress,
+        subject: 'Gift Card Purchase Successful',
+        text: emailText,
+      };
+  
+    // send mail with defined transport object
+    let info = await transporter.sendMail(message).then( console.log('Sending Mail')).catch(() => {return 0;});
+    return info;
+  }
 
-//   const a =  mailer.createTestAccount(async(err, account) => {
-//     if (err) {
-//       console.error('Failed to create a testing account');
-//       console.error(err);
-//     }
-//     let transporter =  await mailer.createTransport({
-//       host: 'smtp.gmail.com',
-//       port: 587,
-//       auth: {
-//         user: 'giftcardsendmail@gmail.com',
-//         pass: 'Qwerty@22'
-//       }
-//     });
-    
-//     let emailText = 'Dear ' + CardCustomerName + ',' + '\n' +  GreetingMessage + '\n' +  'Here are your gift card details : ' + '\n' + 'Card Number : ' + CardNumber + '\n' + 'Card Pin : ' + CardPin + '\n' + 'Merchant Name: ' + MerchantName + '\n' +
-//       'Your Card Balance : ' + CardCreationBalance;
-//     let message = {
-//       to: CardRecepientAddress,
-//       subject: 'Hurray! You got a new Gift Card! ',
-//       text: emailText,
-//     };
 
-//      await transporter.sendMail(message, (error, info) => {
-//       if (error) {
-//         console.log('Error occurred');
-//         console.log(error.message);
-//         return error;
-//       }
-//       transporter.close();
-//     });
-//     return transporter;
-//   });
-//   console.log(a);
-//   console.log('Message sent successfully!');
-//   return a;
-
-// //}
-// // catch(error)
-// // {
-// // console.log('Error occurred while sending mail: '+error);
-// // throw error;
-// }
 
 
 
